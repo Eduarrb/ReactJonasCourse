@@ -1,0 +1,1 @@
+GO scr/StarRating.js

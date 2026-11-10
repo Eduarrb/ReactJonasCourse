@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hola React</title>
+</head>
+<body>
+    <div id="root"></div>
+    <!-- 2️⃣ Obtener los scrips de react desde DIRECCION https://gist.githubusercontent.com/gaearon/0275b1e1518599bbeafcde4722e79ed1/raw/db72dcbf3384ee1708c4a07d3be79860db04bff0/example.html -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- 3️⃣ Crear el componente App -->
+    <script>
+        function App() {
+            /*
+            React.createElement recibe 3 argumentos principales:
+
+            Tipo de elemento
+            "h1" → Aquí estamos creando una etiqueta HTML <h1>.
+
+            Props (propiedades)
+            null → No estamos pasando atributos (como className, id, etc.).
+            Ejemplo con props:
+            
+            Contenido hijo(s)
+            "Hola React" → Es el texto que irá dentro del <h1>.
+            */
+
+            const [time, setTime] = React.useState(new Date().toLocaleTimeString());
+
+            React.useEffect(() => {
+                setInterval(() => {
+                    setTime(new Date().toLocaleTimeString());
+                }, 1000);
+            }, []);
+
+            /*
+            Hook	    ¿Para qué sirve?	                        ¿Cuándo se ejecuta?
+            useState	Guardar y actualizar valores que cambian	Cuando el usuario o la app cambian el estado
+            useEffect	Ejecutar efectos secundarios (peticiones,   Después de renderizar y cuando cambian dependencias
+                        timers, suscripciones, etc.)	
+            */
+
+            return React.createElement("h1", { className: "titulo" }, `Hola React ${time}`);
+
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>

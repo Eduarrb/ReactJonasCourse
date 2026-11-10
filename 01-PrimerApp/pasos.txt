@@ -1,0 +1,12 @@
+Podemos hacer una primera prueba en DIRECCION https://codesandbox.io/ 
+
+o
+
+DIRECCION react.new
+
+
+💥💥 BORRAR src/style.css GO App.js y borrar todo el contenido
+
+https://codesandbox.io/p/sandbox/lucid-meitner-jfpvcx 
+
+NOTA si no funciona el enlace GO App.js

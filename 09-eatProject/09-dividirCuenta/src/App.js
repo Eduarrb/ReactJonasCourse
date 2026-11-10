@@ -1,0 +1,175 @@
+import { useState } from 'react';
+
+const initialFriends = [
+	{
+		id: 118836,
+		name: 'Clark',
+		image: 'https://i.pravatar.cc/48?u=118836',
+		balance: -7,
+	},
+	{
+		id: 933372,
+		name: 'Sarah',
+		image: 'https://i.pravatar.cc/48?u=933372',
+		balance: 20,
+	},
+	{
+		id: 499476,
+		name: 'Anthony',
+		image: 'https://i.pravatar.cc/48?u=499476',
+		balance: 0,
+	},
+];
+
+export default function App() {
+	const [amigos, setAmigos] = useState(initialFriends);
+	const [mostrarAddFriend, setMostrarAddFriend] = useState(false);
+
+	const [amigoSeleccionado, setAmigoSeleccionado] = useState(null);
+
+	function manejadorMostrarAddFriend() {
+		setMostrarAddFriend((show) => !show);
+	}
+
+	function manejarAgregarAmigo(nuevoAmigo) {
+		setAmigos((amigos) => [...amigos, nuevoAmigo]);
+		setMostrarAddFriend(false);
+	}
+
+	function manejadorSeleccion(amigo) {
+		setAmigoSeleccionado(seleccionado => seleccionado?.id === amigo.id ? null : amigo);
+		setMostrarAddFriend(false);
+	}
+
+	// 3️⃣
+	function manejadorDividirCuenta(valor) {
+		// console.log(valor);
+		// 7️⃣
+		setAmigos((amigos) => amigos.map((amigo) => amigo.id === amigoSeleccionado.id ? {...amigo, balance: amigo.balance + valor} : amigo));
+
+		setAmigoSeleccionado(null);
+	}
+
+	return (
+		<div className='app'>
+			<div className='sidebar'>
+				<ListaAmigos amigos={amigos} onSeleccionarAmigo={manejadorSeleccion} amigoSeleccionado={amigoSeleccionado} />
+				{mostrarAddFriend && <AgregarAmigoForm onAddFriend={manejarAgregarAmigo} />}
+				<Button onClick={manejadorMostrarAddFriend}>{mostrarAddFriend ? 'Cerrar' : 'Nuevo Amigo'}</Button>
+			</div>
+			{/* 4️⃣ pasar componente */}
+			{amigoSeleccionado && <DividirCuentaForm amigoSeleccionado={amigoSeleccionado} onDividirCuenta={manejadorDividirCuenta} />}
+		</div>
+	);
+}
+
+function ListaAmigos({ amigos, onSeleccionarAmigo, amigoSeleccionado }) {
+	return (
+		<ul>
+			{amigos.map((amigo) => (
+				<Amigo key={amigo.id} amigo={amigo} onSeleccionarAmigo={onSeleccionarAmigo} amigoSeleccionado={amigoSeleccionado} />
+			))}
+		</ul>
+	);
+}
+
+function Amigo({ amigo, onSeleccionarAmigo, amigoSeleccionado }) {
+  const estaSeleccionado = amigoSeleccionado?.id === amigo.id;
+	return (
+		<li className={estaSeleccionado ? 'selected' : ''}>
+			<img src={amigo.image} alt={amigo.name} />
+			<h3>{amigo.name}</h3>
+			{amigo.balance < 0 && (
+				<p className='red'>
+					Debes: {amigo.name} {Math.abs(amigo.balance)}$
+				</p>
+			)}
+			{amigo.balance > 0 && (
+				<p className='green'>
+					{amigo.name} te debe {Math.abs(amigo.balance)}$
+				</p>
+			)}
+			{amigo.balance === 0 && <p>Tu y {amigo.name} están saldados</p>}
+			<Button onClick={() => onSeleccionarAmigo(amigo)}>{estaSeleccionado ? 'Cerrar' : 'Seleccionar'}</Button>
+		</li>
+	);
+}
+
+function AgregarAmigoForm({ onAddFriend }) {
+	const [nombre, setNombre] = useState('');
+	const [imagen, setImagen] = useState('https://i.pravatar.cc/48');
+
+	function manjadorSubmit(e) {
+		e.preventDefault();
+
+		if (!nombre || !imagen) return;
+		const id = crypto.randomUUID();
+		const nuevoAmigo = {
+			name: nombre,
+			image: `${imagen}?=${id}`,
+			balance: 0,
+			id,
+		};
+		console.log('Nuevo amigo creado:', nuevoAmigo);
+
+		onAddFriend(nuevoAmigo);
+
+		setNombre('');
+		setImagen('https://i.pravatar.cc/48');
+	}
+
+	return (
+		<form className='form-add-friend' onSubmit={manjadorSubmit}>
+			<label>👩‍🤝‍🧑🏻 Nombre Amigo</label>
+			<input type='text' value={nombre} onChange={(e) => setNombre(e.target.value)} />
+			<label>🖼 URL Imagen</label>
+			<input type='text' value={imagen} onChange={(e) => setImagen(e.target.value)} />
+			<Button>Agregar</Button>
+		</form>
+	);
+}
+
+function Button({ children, onClick }) {
+	return (
+		<button className='button' onClick={onClick}>
+			{children}
+		</button>
+	);
+}
+
+// 5️⃣ pasar manejor
+function DividirCuentaForm({ amigoSeleccionado, onDividirCuenta }) {
+	const [cuenta, setCuenta] = useState('');
+	const [pagadoPorUsuario, setPagadoPorUsuario] = useState('');
+	const pagadoPorAmigo = cuenta ? cuenta - pagadoPorUsuario : '';
+	const [quienPaga, setQuienPaga] = useState('user');
+
+	// 2️⃣ manejador submit
+	function manejadorSubmit(e) {
+		e.preventDefault();
+
+		if(!cuenta || !pagadoPorUsuario) return;
+
+		// 6️⃣
+		onDividirCuenta(quienPaga === 'user' ? pagadoPorAmigo : -pagadoPorUsuario);
+	}
+
+	return (
+		// 1️⃣ add submit
+		<form className='form-split-bill' onSubmit={manejadorSubmit}>
+			<h2>Dividir la cuenta con {amigoSeleccionado.name}</h2>
+			<label>💰 Valor cuenta</label>
+			<input type='text' value={cuenta} onChange={(e) => setCuenta(+e.target.value)} />
+			<label>🙍‍♀️ Tu gasto</label>
+			<input type='text' value={pagadoPorUsuario} onChange={(e) => setPagadoPorUsuario(+e.target.value > cuenta ? +pagadoPorUsuario : +e.target.value)} />
+			<label>👩‍🤝‍🧑🏻 {amigoSeleccionado.name} gasto</label>
+			<input type='text' disabled value={pagadoPorAmigo} />
+			<label>💸 ¿Quién pagó la cuenta?</label>
+			<select value={quienPaga} onChange={(e) => setQuienPaga(e.target.value)}>
+				<option value='user'>Tú</option>
+				<option value='friend'>{amigoSeleccionado.name}</option>
+			</select>
+			<Button>Dividir cuenta</Button>
+		</form>
+	);
+}

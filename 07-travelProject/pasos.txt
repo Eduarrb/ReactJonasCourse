@@ -1,0 +1,5 @@
+1️⃣ npm install -g pnpm 
+
+2️⃣ pnpm create react-app@5 travel-steps
+
+3️⃣ GO 01-travel-steps/pasos.txt
